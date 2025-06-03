@@ -19,10 +19,10 @@ db.connect(err => {
     if (err) throw err;
     console.log("Connected to MySQL!");
 });
-
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 
 app.post('/addSchool', (req, res) => {
     const { name, address, latitude, longitude } = req.body;
