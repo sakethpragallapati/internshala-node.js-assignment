@@ -24,7 +24,7 @@ This task helped me gain hands-on experience in backend development using Node.j
 ## Installation & Setup
 
 ### Prerequisites
-- Node.js and npm installed on your machine. You can download them from [https://nodejs.org/](https://nodejs.org/).
+- Node.js and npm installed on your machine.
 - MySQL server running locally or remotely.
 - Basic knowledge of command line usage.
 
