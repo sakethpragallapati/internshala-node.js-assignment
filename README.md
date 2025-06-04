@@ -78,8 +78,12 @@ Use Postman, Insomnia, or your browser to test endpoints.
 Example GET request to list schools sorted by distance near latitude 18.510000 and longitude 79.620000:
 
 API Endpoints
+```
 POST /addSchool
+```
 https://internshala-nodejs-assignment-production.up.railway.app/listSchools?latitude=18.510000&longitude=79.620000
+
+```
 Request body (JSON example):
 {
   "name": "School Name",
@@ -87,8 +91,10 @@ Request body (JSON example):
   "latitude": 18.5204,
   "longitude": 73.8567
 }
-
+```
+```
 GET /listSchools?latitude={lat}&longitude={lng}
+```
 Retrieve a list of schools sorted by distance from the provided latitude and longitude.
 
 Additional Notes
