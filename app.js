@@ -28,7 +28,10 @@ app.post('/addSchool', (req, res) => {
 
     const sql = `INSERT INTO schools (name, address, latitude, longitude) VALUES (?, ?, ?, ?)`;
     db.query(sql, [name, address, latitude, longitude], (err, result) => {
-        if (err) return res.status(500).json({ error: "Database error!" });
+        if (err) {
+            console.error("DB Insert Error:", err);  // Log detailed error
+            return res.status(500).json({ error: err.message }); // Send detailed error back
+        }
         res.status(201).json({ message: "School added!", id: result.insertId });
     });
 });
