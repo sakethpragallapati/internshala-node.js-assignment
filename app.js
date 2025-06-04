@@ -64,8 +64,7 @@ app.post('/addSchool', (req, res) => {
         return res.status(500).json({ error: "Failed to add school" });
       }
       res.status(201).json({ 
-        message: "School added successfully",
-        schoolId: result.insertId
+        message: "School added successfully"
       });
     }
   );
