@@ -30,11 +30,11 @@ This task helped me gain hands-on experience in backend development using Node.j
 
 ### Steps
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd <repository-folder>
-   ```
+Clone the repository:
+```bash
+git clone <repository-url>
+cd <repository-folder>
+```
 Install dependencies:
 
 ```bash
