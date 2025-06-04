@@ -77,11 +77,9 @@ Use Postman, Insomnia, or your browser to test endpoints.
 
 Example GET request to list schools sorted by distance near latitude 18.510000 and longitude 79.620000:
 
-https://internshala-nodejs-assignment-production.up.railway.app/listSchools?latitude=18.510000&longitude=79.620000
 API Endpoints
 POST /addSchool
-Add a new school.
-
+https://internshala-nodejs-assignment-production.up.railway.app/listSchools?latitude=18.510000&longitude=79.620000
 Request body (JSON example):
 {
   "name": "School Name",
@@ -89,16 +87,14 @@ Request body (JSON example):
   "latitude": 18.5204,
   "longitude": 73.8567
 }
+
 GET /listSchools?latitude={lat}&longitude={lng}
 Retrieve a list of schools sorted by distance from the provided latitude and longitude.
 
 Additional Notes
 The database table schools will be created automatically if it does not exist when the server starts.
-
 The app uses a connection pool for efficient database access.
-
 Distances are calculated using the Haversine formula for accurate geospatial results.
-
 This project uses environment variables to keep sensitive data secure.
 
 Thank you for considering my submission.
