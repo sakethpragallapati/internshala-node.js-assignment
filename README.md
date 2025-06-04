@@ -32,8 +32,8 @@ This task helped me gain hands-on experience in backend development using Node.j
 
 Clone the repository:
 ```bash
-git clone <repository-url>
-cd <repository-folder>
+git clone https://github.com/sakethpragallapati/internshala-node.js-assignment.git
+cd internshala-node-js-assignment
 ```
 Install dependencies:
 
