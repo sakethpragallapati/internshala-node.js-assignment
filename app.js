@@ -8,54 +8,105 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const urlDB = `mysql://${process.env.MYSQLUSER}:${process.env.MYSQLPASSWORD}@${process.env.MYSQLHOST}:${process.env.MYSQLPORT}/${process.env.MYSQLDATABASE}`
-const db = mysql.createConnection(urlDB);
-
-db.connect(err => {
-    if (err) throw err;
-    console.log("Connected to MySQL!");
+const pool = mysql.createPool({
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
-app.listen(process.env.PORT, () => {
-    console.log(`Server running on port ${process.env.PORT}`);
-});
 
-app.post('/addSchool', (req, res) => {
-    const { name, address, latitude, longitude } = req.body;
-
-    if (!name || !address || !latitude || !longitude) {
-        return res.status(400).json({ error: "Missing fields!" });
+const initializeDatabase = () => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error connecting to database:', err);
+      return;
     }
 
-    const sql = `INSERT INTO schools (name, address, latitude, longitude) VALUES (?, ?, ?, ?)`;
-    db.query(sql, [name, address, latitude, longitude], (err, result) => {
-        if (err) {
-            console.error("DB Insert Error:", err);  // Log detailed error
-            return res.status(500).json({ error: err.message }); // Send detailed error back
-        }
-        res.status(201).json({ message: "School added!", id: result.insertId });
+    connection.query(`
+      CREATE TABLE IF NOT EXISTS schools (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        address VARCHAR(200) NOT NULL,
+        latitude FLOAT NOT NULL,
+        longitude FLOAT NOT NULL
+      )
+    `, (error) => {
+      connection.release();
+      
+      if (error) {
+        console.error('Error creating table:', error);
+      } else {
+        console.log('✅ Schools table ready!');
+      }
     });
+  });
+};
+
+initializeDatabase();
+
+app.post('/addSchool', (req, res) => {
+  const { name, address, latitude, longitude } = req.body;
+
+  if (!name || !address || latitude === undefined || longitude === undefined) {
+    return res.status(400).json({ error: "All fields are required!" });
+  }
+
+  pool.query(
+    'INSERT INTO schools (name, address, latitude, longitude) VALUES (?, ?, ?, ?)',
+    [name, address, latitude, longitude],
+    (err, result) => {
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Failed to add school" });
+      }
+      res.status(201).json({ 
+        message: "School added successfully",
+        schoolId: result.insertId
+      });
+    }
+  );
 });
 
 app.get('/listSchools', (req, res) => {
-    const { latitude, longitude } = req.query;
+  const { latitude, longitude } = req.query;
 
-    if (!latitude || !longitude) {
-        return res.status(400).json({ error: "Latitude & Longitude required!" });
+  if (!latitude || !longitude) {
+    return res.status(400).json({ error: "Latitude & Longitude required!" });
+  }
+
+  pool.query('SELECT * FROM schools', (err, schools) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Failed to fetch schools" });
     }
 
-    const sql = `SELECT * FROM schools`;
-    db.query(sql, (err, schools) => {
-        if (err) return res.status(500).json({ error: "Database error!" });
-
-        const schoolsWithDistance = schools.map(school => {
-            const distance = Math.sqrt(
-                Math.pow(school.latitude - parseFloat(latitude), 2) +
-                Math.pow(school.longitude - parseFloat(longitude), 2)
-            );
-            return { ...school, distance: parseFloat(distance.toFixed(2)) };
-        });
-
-        schoolsWithDistance.sort((a, b) => a.distance - b.distance);
-        res.json(schoolsWithDistance);
+    const schoolsWithDistance = schools.map(school => {
+      const R = 6371;
+      const dLat = (school.latitude - latitude) * Math.PI / 180;
+      const dLon = (school.longitude - longitude) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(latitude * Math.PI / 180) * Math.cos(school.latitude * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const distance = R * c;
+      
+      return { 
+        ...school, 
+        distance: parseFloat(distance.toFixed(2)) 
+      };
     });
+
+    schoolsWithDistance.sort((a, b) => a.distance - b.distance);
+    res.json(schoolsWithDistance);
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
