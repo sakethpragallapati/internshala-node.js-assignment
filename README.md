@@ -81,7 +81,7 @@ API Endpoints
 ```
 POST /addSchool
 ```
-https://internshala-nodejs-assignment-production.up.railway.app/listSchools?latitude=18.510000&longitude=79.620000
+Test the Live API Endpoint: https://internshala-nodejs-assignment-production.up.railway.app/listSchools?latitude=18.510000&longitude=79.620000
 
 ```
 Request body (JSON example):
